@@ -4,12 +4,13 @@ import toast, { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './components/shared/Navbar';
 import WelcomeHero from './components/shared/WelcomeHero';
-import OuterSidebar from './components/sidebar/OuterSidebar';
-import InnerSidebar from './components/sidebar/InnerSidebar';
+import ClaudeSidebar from './components/sidebar/ClaudeSidebar';
 import ChatThread from './components/chat/ChatThread';
 import ChatInput from './components/chat/ChatInput';
 import PlanDisplay from './components/plan/PlanDisplay';
 import DestinationCards from './components/plan/DestinationCards';
+import TripsPage from './components/pages/TripsPage';
+import AboutPage from './components/pages/AboutPage';
 import useGeolocation from './hooks/useGeolocation';
 import {
   sendMessage,
@@ -20,9 +21,10 @@ import {
 import {
   getSessionId,
   saveSessionId,
-  getTrips,
-  saveTrip,
   clearSessionStorage,
+  getRecentTrips,
+  saveCompletedTrip,
+  removeRecentTrip,
 } from './utils/localStorage';
 import { willFetchDestinations, getCurrencyCode } from './utils/planHelpers';
 
@@ -37,11 +39,12 @@ function App() {
   const [awaitingDestinationPick, setAwaitingDestinationPick] = useState(false);
   const [conversationStarted, setConversationStarted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarView, setSidebarView] = useState('chat');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMode, setLoadingMode] = useState(null);
   const [switching, setSwitching] = useState(false);
-  const [trips, setTrips] = useState(() => getTrips());
+  const [recents, setRecents] = useState(() => getRecentTrips());
+  const [activePage, setActivePage] = useState('chat'); // chat | trips | about
+  const [composerText, setComposerText] = useState('');
 
   const sourceLocation = geoCity ?? null;
 
@@ -64,7 +67,7 @@ function App() {
     setIsLoading(false);
     setLoadingMode(null);
     setSwitching(false);
-    setSidebarView('chat');
+    setActivePage('chat');
   }, []);
 
   const appendAssistant = useCallback((content, isFollowUp = false) => {
@@ -73,6 +76,42 @@ function App() {
       { id: uuidv4(), role: 'assistant', content, isFollowUp },
     ]);
   }, []);
+
+  const persistCompleted = useCallback(
+    ({ plan, state, destinations: dests, assistantMessage }) => {
+      const planned_at = new Date().toISOString();
+      const category = state?.category || '';
+      const currency_symbol = state?.currency_symbol || plan?.currency_symbol || '$';
+      const duration_days = state?.trip_duration_days ?? plan?.duration_days ?? null;
+      const destination = plan?.destination || state?.destination_preference || 'Trip';
+      const country = plan?.country || state?.destination_country || '';
+      const budget = state?.budget ?? null;
+
+      const fullMessages = [
+        ...messages,
+        ...(assistantMessage
+          ? [{ id: uuidv4(), role: 'assistant', content: assistantMessage }]
+          : []),
+      ];
+
+      saveCompletedTrip({
+        session_id: sessionId,
+        destination,
+        country,
+        category,
+        budget,
+        currency_symbol,
+        duration_days,
+        planned_at,
+        messages: fullMessages,
+        plan,
+        state,
+        destinations: dests || [],
+      });
+      setRecents(getRecentTrips());
+    },
+    [messages, sessionId]
+  );
 
   const handleApiResponse = useCallback(
     (data) => {
@@ -95,9 +134,13 @@ function App() {
           setCollectedState(data.collected_state || {});
           setCurrentPlan(plan);
           setAwaitingDestinationPick(false);
-          saveTrip(plan, data.collected_state, destinations);
-          setTrips(getTrips());
           appendAssistant(data.message);
+          persistCompleted({
+            plan,
+            state: data.collected_state || {},
+            destinations,
+            assistantMessage: data.message,
+          });
           toast.success('Your vacation plan is ready!');
           break;
         }
@@ -118,7 +161,7 @@ function App() {
           break;
       }
     },
-    [appendAssistant, destinations]
+    [appendAssistant, destinations, persistCompleted]
   );
 
   const handleSend = useCallback(
@@ -128,6 +171,8 @@ function App() {
 
       if (!conversationStarted) setConversationStarted(true);
       setSidebarOpen(false);
+      setActivePage('chat');
+      setComposerText('');
 
       setMessages((prev) => [...prev, { id: uuidv4(), role: 'user', content: trimmed }]);
 
@@ -185,9 +230,13 @@ function App() {
         if (data.type === 'plan') {
           setCurrentPlan(data.plan);
           setCollectedState(data.collected_state || {});
-          saveTrip(data.plan, data.collected_state, destinations);
-          setTrips(getTrips());
           appendAssistant(data.message);
+          persistCompleted({
+            plan: data.plan,
+            state: data.collected_state || {},
+            destinations,
+            assistantMessage: data.message,
+          });
           toast.success(`Plan ready for ${chosenDestination}`);
         } else {
           handleApiResponse(data);
@@ -204,7 +253,15 @@ function App() {
         setSwitching(false);
       }
     },
-    [sessionId, destinations, switching, isLoading, appendAssistant, handleApiResponse]
+    [
+      sessionId,
+      destinations,
+      switching,
+      isLoading,
+      appendAssistant,
+      handleApiResponse,
+      persistCompleted,
+    ]
   );
 
   const handleSwitchDestination = useCallback(
@@ -224,9 +281,13 @@ function App() {
         if (data.type === 'plan') {
           setCurrentPlan(data.plan);
           setCollectedState(data.collected_state || {});
-          saveTrip(data.plan, data.collected_state, destinations);
-          setTrips(getTrips());
           appendAssistant(data.message);
+          persistCompleted({
+            plan: data.plan,
+            state: data.collected_state || {},
+            destinations,
+            assistantMessage: data.message,
+          });
           toast.success(`Switched to ${chosenDestination}`);
         } else {
           handleApiResponse(data);
@@ -241,7 +302,15 @@ function App() {
         setSwitching(false);
       }
     },
-    [sessionId, destinations, switching, isLoading, appendAssistant, handleApiResponse]
+    [
+      sessionId,
+      destinations,
+      switching,
+      isLoading,
+      appendAssistant,
+      handleApiResponse,
+      persistCompleted,
+    ]
   );
 
   const handleNewChat = useCallback(async () => {
@@ -251,7 +320,10 @@ function App() {
       /* session may not exist */
     }
     resetConversation(true);
-    setSidebarOpen(false);
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+    setActivePage('chat');
     toast.success('Started a new chat');
   }, [sessionId, resetConversation]);
 
@@ -266,26 +338,41 @@ function App() {
     toast.success('Ready to plan a new trip');
   }, [sessionId, resetConversation]);
 
-  const handleSelectTrip = useCallback((trip) => {
-    setCurrentPlan(trip.plan);
+  const handleSelectRecent = useCallback((trip) => {
+    if (!trip) return;
+    if (trip.session_id) {
+      setSessionId(trip.session_id);
+      saveSessionId(trip.session_id);
+    }
+    setMessages(Array.isArray(trip.messages) ? trip.messages : []);
+    setCurrentPlan(trip.plan || null);
     setDestinations(trip.destinations || []);
     setCollectedState(trip.state || {});
     setConversationStarted(true);
     setAwaitingDestinationPick(false);
-    setSidebarView('chat');
-    setSidebarOpen(false);
+    setActivePage('chat');
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  }, []);
+
+  const handleDeleteRecent = useCallback((trip) => {
+    const next = removeRecentTrip(trip?.session_id);
+    setRecents(next);
   }, []);
 
   const currencyCode = getCurrencyCode(collectedState);
   const currencySymbol = collectedState.currency_symbol || '$';
 
   const showWelcome = !conversationStarted && !currentPlan;
-  const showChatPanel = conversationStarted && !currentPlan;
 
   return (
-    <div className="flex h-full min-h-screen flex-col bg-white">
+    <div className="flex h-screen min-h-0 flex-col overflow-hidden bg-white">
       <Toaster position="top-center" toastOptions={{ className: 'text-sm' }} />
-      <Navbar />
+      <Navbar
+        onAbout={() => setActivePage('about')}
+        onToggleSidebar={() => setSidebarOpen((open) => !open)}
+      />
 
       {!geoLoading && !sourceLocation && conversationStarted && (
         <p className="no-print bg-amber-50 px-4 py-2 text-center text-xs text-amber-800">
@@ -293,132 +380,147 @@ function App() {
         </p>
       )}
 
-      <div className="relative flex min-h-0 flex-1 flex-col md:flex-row">
-        <AnimatePresence>
-          {sidebarOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black/40 md:hidden"
-              onClick={() => setSidebarOpen(false)}
-            />
-          )}
-        </AnimatePresence>
+      <div className="relative flex min-h-0 flex-1 overflow-hidden">
+        <ClaudeSidebar
+          isOpen={sidebarOpen}
+          onOpen={() => setSidebarOpen(true)}
+          onClose={() => setSidebarOpen(false)}
+          onNewChat={handleNewChat}
+          onSearch={() => {}}
+          onMyTrips={() => {
+            setActivePage('trips');
+            if (window.innerWidth < 768) {
+              setSidebarOpen(false);
+            }
+          }}
+          recents={recents}
+          onSelectRecent={handleSelectRecent}
+          onDeleteRecent={handleDeleteRecent}
+          activeRecentSessionId={sessionId}
+        />
 
-        <div
-          className={`no-print fixed inset-y-0 left-0 z-50 mt-14 h-[calc(100%-3.5rem)] w-[380px] max-w-[100vw] transform overflow-hidden bg-white shadow-xl transition-transform duration-300 md:static md:z-20 md:mt-0 md:h-auto md:shrink-0 md:shadow-none ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-          }`}
-        >
-          {!conversationStarted ? (
-            <OuterSidebar
-              onClose={() => setSidebarOpen(false)}
-              onNewChat={handleNewChat}
-              onSend={handleSend}
-              disabled={isLoading}
-            />
-          ) : (
-            <InnerSidebar
-              onClose={() => setSidebarOpen(false)}
-              onBack={() => {
-                if (!messages.length) resetConversation(false);
-              }}
-              onNewChat={handleNewChat}
-              activeView={sidebarView}
-              onViewChange={setSidebarView}
-              trips={trips}
-              onSelectTrip={handleSelectTrip}
-              onStartPlanning={() => {
-                setSidebarView('chat');
-                setSidebarOpen(false);
-              }}
-              onSend={handleSend}
-              isLoading={isLoading || awaitingDestinationPick}
-            />
-          )}
-        </div>
-
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <div className="no-print flex items-center gap-2 border-b border-border px-4 py-2 md:hidden">
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(true)}
-              className="rounded-lg p-2 text-slate-600 hover:bg-card"
-              aria-label="Open menu"
-            >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <span className="text-sm font-medium text-slate-600">Menu</span>
-          </div>
-
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            {showWelcome && (
-              <WelcomeHero onSearch={handleSend} onCategoryClick={handleSend} disabled={isLoading} />
-            )}
-
-            {showChatPanel && (
-              <div className="flex min-h-0 flex-1 flex-col px-4 md:px-8">
-                <ChatThread messages={messages} isLoading={isLoading} loadingMode={loadingMode} />
-
-                {awaitingDestinationPick && destinations.length > 0 && (
-                  <div className="shrink-0 overflow-y-auto border-t border-border py-4">
-                    <DestinationCards
-                      destinations={destinations}
-                      currencySymbol={currencySymbol}
-                      currencyCode={currencyCode}
-                      onSelect={handleSelectDestination}
-                      disabled={isLoading || switching}
-                      title="Select a destination"
-                      subtitle="Choose one to generate your full vacation plan"
-                    />
-                  </div>
-                )}
-
-                <div className="shrink-0 border-t border-border py-4 md:hidden">
-                  <ChatInput
-                    onSend={handleSend}
-                    disabled={isLoading || awaitingDestinationPick}
-                  />
-                </div>
-              </div>
-            )}
-
-            {currentPlan && (
-              <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
-                {(isLoading || switching) && (
-                  <div className="mb-6">
-                    <ChatThread
-                      messages={[]}
-                      isLoading
-                      loadingMode="planning"
-                    />
-                  </div>
-                )}
-                <PlanDisplay
-                  plan={currentPlan}
-                  destinations={destinations}
-                  onSwitchDestination={handleSwitchDestination}
-                  onPlanAnother={handlePlanAnother}
-                  switching={switching}
+        <main className="flex min-w-0 flex-1 flex-col bg-white">
+          <AnimatePresence mode="wait">
+            {activePage === 'about' && (
+              <div key="about" className="min-h-0 flex-1 overflow-y-auto">
+                <AboutPage
+                  onStartPlanning={() => {
+                    setActivePage('chat');
+                    setSidebarOpen(false);
+                  }}
                 />
               </div>
             )}
-          </div>
+
+            {activePage === 'trips' && (
+              <div key="trips" className="min-h-0 flex-1">
+                <TripsPage
+                  onPlanAnotherTrip={handlePlanAnother}
+                  onLoadTrip={(t) => {
+                    setCollectedState(t.state || {});
+                    setCurrentPlan(t.plan || null);
+                    setDestinations([]);
+                    setMessages([
+                      { id: uuidv4(), role: 'assistant', content: `Loaded trip plan for ${t.destination}.` },
+                    ]);
+                    setConversationStarted(true);
+                    setAwaitingDestinationPick(false);
+                    setActivePage('chat');
+                  }}
+                />
+              </div>
+            )}
+
+            {activePage === 'chat' && (
+              <motion.div
+                key="chat"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex min-h-0 flex-1 flex-col overflow-hidden"
+              >
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                  {showWelcome ? (
+                    <div className="flex min-h-0 flex-1 items-center justify-center px-4">
+                      <div className="w-full max-w-2xl">
+                        <WelcomeHero
+                          onCategoryClick={(cat) =>
+                            setComposerText(`I want a ${cat.toLowerCase()} vacation`)
+                          }
+                          disabled={isLoading}
+                        />
+                        <div className="mt-6">
+                          <ChatInput
+                            size="lg"
+                            onSend={handleSend}
+                            disabled={isLoading}
+                            placeholder="Describe your ideal trip..."
+                            value={composerText}
+                            onChange={setComposerText}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+                      <div className="flex-1 overflow-y-auto px-3 py-4 md:px-6">
+                        <div className="mx-auto w-full max-w-[800px]">
+                          <ChatThread messages={messages} isLoading={isLoading} loadingMode={loadingMode} />
+
+                          {awaitingDestinationPick && destinations.length > 0 && (
+                            <div className="mt-4">
+                              <DestinationCards
+                                destinations={destinations}
+                                currencySymbol={currencySymbol}
+                                currencyCode={currencyCode}
+                                onSelect={handleSelectDestination}
+                                disabled={isLoading || switching}
+                                title="Select a destination"
+                                subtitle="Choose one to generate your full vacation plan"
+                              />
+                            </div>
+                          )}
+
+                          {currentPlan && (
+                            <div className="mt-8">
+                              <PlanDisplay
+                                plan={currentPlan}
+                                destinations={destinations}
+                                onSwitchDestination={handleSwitchDestination}
+                                onPlanAnother={handlePlanAnother}
+                                switching={switching}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="sticky bottom-0 z-10 shrink-0 border-t border-border bg-white/95 p-4 backdrop-blur">
+                        <div className="mx-auto w-full max-w-[800px]">
+                          <ChatInput
+                            onSend={handleSend}
+                            disabled={isLoading || awaitingDestinationPick || !!currentPlan}
+                            disabledText={
+                              isLoading 
+                                ? 'Planning your trip...' 
+                                : currentPlan 
+                                  ? 'Plan complete — start a new chat to plan another trip' 
+                                  : undefined
+                            }
+                            placeholder="Describe your ideal trip..."
+                            value={composerText}
+                            onChange={setComposerText}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </main>
       </div>
-
-      <section
-        id="about"
-        className="no-print border-t border-border bg-card px-6 py-8 text-center text-sm text-slate-500"
-      >
-        <p>
-          <strong className="text-primary">VoyageAI</strong> — AI vacation planning. Backend:{' '}
-          {import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'}
-        </p>
-      </section>
     </div>
   );
 }

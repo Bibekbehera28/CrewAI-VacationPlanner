@@ -5,8 +5,8 @@ export default function ChatBubble({ role, content, isFollowUp }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: isUser ? 20 : -20 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
       className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
     >
@@ -14,7 +14,9 @@ export default function ChatBubble({ role, content, isFollowUp }) {
         className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed md:max-w-[75%] ${
           isUser
             ? 'bg-primary text-white'
-            : `bg-card text-slate-700 ${isFollowUp ? 'border-l-4 border-primary' : 'border border-border'}`
+            : `bg-slate-100 text-slate-800 ${
+                isFollowUp ? 'border-l-4 border-primary' : 'border border-border'
+              }`
         }`}
       >
         {content}

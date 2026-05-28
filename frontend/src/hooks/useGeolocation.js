@@ -1,16 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function useGeolocation() {
+  const supported = useMemo(() => typeof navigator !== 'undefined' && !!navigator.geolocation, []);
   const [city, setCity] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(() => supported);
+  const [error, setError] = useState(() => (supported ? null : 'Geolocation not supported'));
 
   useEffect(() => {
-    if (!navigator.geolocation) {
-      setError('Geolocation not supported');
-      setLoading(false);
-      return;
-    }
+    if (!supported) return;
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -37,7 +34,7 @@ export default function useGeolocation() {
       },
       { timeout: 10000, maximumAge: 300000 }
     );
-  }, []);
+  }, [supported]);
 
   return { city, loading, error };
 }

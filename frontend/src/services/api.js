@@ -47,4 +47,10 @@ export async function clearSession(sessionId) {
   return data;
 }
 
+/** GET /api/trips */
+export async function fetchTrips() {
+  const { data } = await api.get('/api/trips');
+  return data;
+}
+
 export default api;

@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import {
-  getCurrencyCode,
   getDestBudgetPerPerson,
   getDestHotelPerNight,
 } from '../../utils/planHelpers';

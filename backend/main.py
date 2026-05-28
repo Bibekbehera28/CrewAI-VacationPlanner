@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 from crews.vacation_crew import extract_travel_data, run_destination_agent, run_planning_agents
-from db.supabase_client import save_plan
+from db.supabase_client import save_plan, supabase
 
 app = FastAPI()
 
@@ -19,7 +19,6 @@ app.add_middleware(
 executor = ThreadPoolExecutor(max_workers=4)
 sessions: dict = {}
 
-# Couple and Bachelor are fixed — never ask
 CATEGORY_DEFAULT_PEOPLE = {
     "Couple": 2,
     "Bachelor": 1,
@@ -30,13 +29,14 @@ FOLLOW_UP_QUESTIONS = {
     "budget":             "What is your total budget for this trip? Please mention the currency too (e.g. ₹15000, $500, €800).",
     "trip_duration_days": "How many days are you planning for this trip?",
     "number_of_people":   "How many people will be travelling?",
+    "source_location":    "Which city will you be travelling from?"
 }
 
 
 class ChatMessage(BaseModel):
     session_id: str
     message: str
-    source_location: Optional[str] = None  # sent by frontend from browser geolocation
+    source_location: Optional[str] = None
 
 
 class DestinationSelect(BaseModel):
@@ -50,6 +50,34 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/api/trips")
+async def get_trips():
+    try:
+        result = supabase.table("vacation_plans").select("*").order("created_at", desc=True).execute()
+        trips = []
+        for row in result.data:
+            state = row.get("extracted_state", {})
+            plan = row.get("final_plan", {})
+            trips.append({
+                "id": row.get("id"),
+                "created_at": row.get("created_at"),
+                "destination": state.get("destination_preference") or plan.get("destination", "Unknown"),
+                "country": state.get("destination_country") or plan.get("country", ""),
+                "category": state.get("category", ""),
+                # Always use budget_in_user_currency — never the USD converted value
+                "budget": state.get("budget_in_user_currency") or state.get("budget", 0),
+                "currency_symbol": state.get("currency_symbol", "$"),
+                "currency_name": state.get("currency_name", "US Dollars (USD)"),
+                "duration_days": state.get("trip_duration_days", 0),
+                "number_of_people": state.get("number_of_people", 0),
+                "user_query": row.get("user_query", ""),
+                "full_plan": plan
+            })
+        return {"trips": trips}
+    except Exception as e:
+        return {"trips": [], "error": str(e)}
+
+
 @app.post("/api/chat")
 async def chat(body: ChatMessage):
     session_id = body.session_id
@@ -59,7 +87,7 @@ async def chat(body: ChatMessage):
         sessions[session_id] = {
             "state": {},
             "history": [],
-            "stage": "collecting",   # collecting → destinations → planning → done
+            "stage": "collecting",
             "destinations": [],
             "final_plan": None
         }
@@ -67,7 +95,6 @@ async def chat(body: ChatMessage):
     session = sessions[session_id]
     session["history"].append({"role": "user", "content": user_message})
 
-    # ── If plan already done ──
     if session["stage"] == "done":
         return {
             "type": "done",
@@ -75,13 +102,12 @@ async def chat(body: ChatMessage):
             "plan": session["final_plan"]
         }
 
-    # ── Inject browser location from frontend ──
+    # Inject browser location
     if body.source_location and not session["state"].get("source_location"):
         session["state"]["source_location"] = body.source_location
 
     loop = asyncio.get_event_loop()
 
-    # ── Stage: collecting — run conversation agent ──
     if session["stage"] == "collecting":
         try:
             updated_state = await loop.run_in_executor(
@@ -102,17 +128,17 @@ async def chat(body: ChatMessage):
             if category in CATEGORY_DEFAULT_PEOPLE:
                 session["state"]["number_of_people"] = CATEGORY_DEFAULT_PEOPLE[category]
 
-        # Check mandatory fields
+        # Build missing fields
         mandatory = ["category", "budget", "trip_duration_days"]
         missing = [f for f in mandatory if not session["state"].get(f)]
 
-        # Ask number_of_people only for Family and Friends
         category = session["state"].get("category")
         if not session["state"].get("number_of_people") and category in ["Family", "Friends", None]:
-            if "number_of_people" not in missing:
-                missing.append("number_of_people")
+            missing.append("number_of_people")
 
-        # Ask ONE follow-up if anything missing
+        if not session["state"].get("source_location"):
+            missing.append("source_location")
+
         if missing:
             question = FOLLOW_UP_QUESTIONS.get(
                 missing[0],
@@ -157,7 +183,6 @@ async def select_destination(body: DestinationSelect):
     session = sessions[session_id]
     state = session["state"]
 
-    # Store chosen destination
     state["destination_preference"] = body.chosen_destination
     state["destination_country"] = body.chosen_country
     session["stage"] = "planning"

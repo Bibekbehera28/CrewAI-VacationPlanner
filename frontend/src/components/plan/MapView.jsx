@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { motion } from 'framer-motion';
 import { getCurrencyCode, getHotelPricePerNight } from '../../utils/planHelpers';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -13,6 +14,17 @@ L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
   iconShadow: markerShadow,
 });
+
+function MapResizer() {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
 
 async function geocodeCity(cityName) {
   const q = encodeURIComponent(cityName);
@@ -34,14 +46,23 @@ export default function MapView({ destination, hotels = [], plan }) {
     let cancelled = false;
     (async () => {
       const coords = await geocodeCity(destination);
-      if (!cancelled && coords) setCenter([coords.lat, coords.lon]);
+      if (!cancelled && coords) setCenter([Number(coords.lat), Number(coords.lon)]);
     })();
     return () => {
       cancelled = true;
     };
   }, [destination]);
 
-  const hotelMarkers = (hotels || []).filter((h) => h.lat != null && h.lon != null);
+  const hotelMarkers = (hotels || []).filter((h) => h.lat != null && h.lon != null).map((h) => ({
+    ...h,
+    lat: Number(h.lat),
+    lon: Number(h.lon),
+  }));
+
+  // Create a stable key that uniquely identifies this map instance
+  // by combining destination with first hotel (if available) to prevent key collisions
+  const firstHotelName = hotelMarkers[0]?.name || '';
+  const mapKey = `map-${destination}-${firstHotelName}`;
 
   if (!center) {
     return (
@@ -55,13 +76,22 @@ export default function MapView({ destination, hotels = [], plan }) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="h-[300px] overflow-hidden rounded-2xl border border-border"
+      className="h-[300px] w-full overflow-hidden rounded-2xl border border-border"
+      style={{ height: '300px' }}
     >
-      <MapContainer center={center} zoom={13} className="h-full w-full" scrollWheelZoom={false}>
+      <MapContainer
+        key={mapKey}
+        center={center}
+        zoom={13}
+        className="h-full w-full"
+        scrollWheelZoom={false}
+        style={{ height: '300px', width: '100%' }}
+      >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <MapResizer />
         {hotelMarkers.map((hotel, i) => (
           <Marker key={`${hotel.name}-${i}`} position={[hotel.lat, hotel.lon]}>
             <Popup>

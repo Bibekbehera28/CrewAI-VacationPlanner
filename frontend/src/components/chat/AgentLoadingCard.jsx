@@ -19,12 +19,11 @@ export default function AgentLoadingCard({ mode = 'planning' }) {
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
-    setActiveStep(0);
     const interval = setInterval(() => {
       setActiveStep((s) => (s < steps.length - 1 ? s + 1 : s));
     }, 4000);
     return () => clearInterval(interval);
-  }, [mode, steps.length]);
+  }, [steps.length]);
 
   const title =
     mode === 'destinations' ? 'Finding destinations for you...' : 'Building your trip plan...';

@@ -1,8 +1,19 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
-export default function ChatInput({ onSend, disabled, placeholder = 'Ask anything about your trip...' }) {
-  const [text, setText] = useState('');
+export default function ChatInput({
+  onSend,
+  disabled,
+  placeholder = 'Describe your ideal trip...',
+  value,
+  onChange,
+  disabledText,
+  size = 'md', // md | lg
+}) {
+  const isControlled = value != null && typeof onChange === 'function';
+  const [uncontrolled, setUncontrolled] = useState('');
+  const text = isControlled ? value : uncontrolled;
+  const setText = isControlled ? onChange : setUncontrolled;
 
   const submit = () => {
     const msg = text.trim();
@@ -12,15 +23,21 @@ export default function ChatInput({ onSend, disabled, placeholder = 'Ask anythin
   };
 
   return (
-    <div className="flex items-center gap-2 rounded-2xl border border-border bg-white p-2 shadow-sm focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
+    <div
+      className={`flex items-center gap-2 rounded-2xl border border-border bg-white p-2 shadow-sm transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 ${
+        size === 'lg' ? 'px-3 py-2.5' : ''
+      }`}
+    >
       <input
         type="text"
         value={text}
         disabled={disabled}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && submit()}
-        placeholder={placeholder}
-        className="min-w-0 flex-1 bg-transparent px-3 py-2 text-sm outline-none disabled:opacity-50"
+        placeholder={disabled && disabledText ? disabledText : placeholder}
+        className={`min-w-0 flex-1 bg-transparent px-3 outline-none disabled:opacity-60 ${
+          size === 'lg' ? 'py-3 text-base' : 'py-2 text-sm'
+        }`}
       />
       <motion.button
         type="button"
