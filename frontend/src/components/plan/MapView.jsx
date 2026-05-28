@@ -43,6 +43,10 @@ export default function MapView({ destination, hotels = [], plan }) {
   const code = getCurrencyCode(plan);
 
   useEffect(() => {
+    // Reset center to null immediately when destination changes
+    // This ensures "Loading map..." shows and old map doesn't persist
+    setCenter(null);
+    
     let cancelled = false;
     (async () => {
       const coords = await geocodeCity(destination);
