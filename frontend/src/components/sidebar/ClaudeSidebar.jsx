@@ -65,7 +65,7 @@ export default function ClaudeSidebar({
         transition={{ type: 'spring', stiffness: 320, damping: 34 }}
         className="no-print relative z-30 hidden h-full shrink-0 overflow-hidden border-r border-border bg-white shadow-sm md:flex md:flex-col"
       >
-        <div className="flex w-full flex-1 flex-col items-center gap-2 pt-1">
+        <div className="flex min-h-0 w-full flex-1 flex-col items-center gap-2 pt-1">
           {!isOpen ? (
             <>
               <IconButton title="Open sidebar" onClick={onOpen}>
@@ -98,7 +98,7 @@ export default function ClaudeSidebar({
               </IconButton>
             </>
           ) : (
-            <div ref={panelRef} className="flex h-full w-full flex-col px-3 pb-3 pt-1">
+            <div ref={panelRef} className="flex min-h-0 h-full w-full flex-col px-3 pb-3 pt-1">
               <div className="flex items-center justify-between px-2 pb-2">
                 <p className="text-xs font-semibold tracking-wide text-slate-500">VoyageAI</p>
                 <button
