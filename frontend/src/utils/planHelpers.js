@@ -37,6 +37,7 @@ export function getBudgetBreakdown(plan) {
   const code = getCurrencyCode(plan);
   const bd = plan?.budget_breakdown || {};
   return {
+    flights: fieldForCurrency(bd, 'flights', code) || bd[`flights_${code}`] || 0,
     hotels: fieldForCurrency(bd, 'hotels', code) || bd[`hotels_${code}`] || 0,
     activities:
       fieldForCurrency(bd, 'activities_and_food', code) ||
@@ -63,6 +64,12 @@ export function buildPlanSummary(plan) {
     `From: ${plan.departure_city}`,
     `Season: ${plan.season || 'N/A'}`,
     `Weather: ${plan.weather_summary || 'N/A'}`,
+    '',
+    'Flights:',
+    ...(plan.flights || []).map(
+      (f) =>
+        `- ${f.airline} (${f.flight_type || 'Flight'}): ${f.departure_city} → ${f.arrival_city}, ${f.duration || 'N/A'}, ${sym}${fieldForCurrency(f, 'estimated_price_per_person', code)}/person`
+    ),
     '',
     'Hotels:',
     ...(plan.hotels || []).map(

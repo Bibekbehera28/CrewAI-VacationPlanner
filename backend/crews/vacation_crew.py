@@ -5,6 +5,7 @@ from crewai import Task, Crew
 from agents.conversation_agent import conversation_agent
 from agents.destination_agent import destination_agent
 from agents.hotel_agent import hotel_agent
+from agents.flight_agent import flight_agent
 from agents.final_planner_agent import final_planner_agent
 from tools.weather_tool import get_current_season_and_weather
 from tools.places_tool import get_hotels_in_city
@@ -357,12 +358,55 @@ Return ONLY this JSON:
         expected_output="JSON with 3 hotels with non-zero prices",
         agent=hotel_agent
     )
+        # ───────────────── FLIGHT TASK ─────────────────
 
+    estimated_flight_budget = round(budget_user * 0.20)
+
+    t_flights = Task(
+        description=f"""
+Generate 2 realistic flight options.
+
+From: {source_location}
+To: {top_destination}, {top_country}
+
+Travelers: {num_people}
+Trip Duration: {duration} days
+Category: {category}
+
+IMPORTANT:
+- Generate realistic airline names
+- Generate realistic prices
+- Include direct or 1-stop flights
+- Prices must be in {currency_name}
+
+Budget rules:
+- Total estimated flight budget should stay near {currency_symbol}{estimated_flight_budget}
+
+Return ONLY this JSON:
+
+{{
+    "flights": [
+        {{
+            "airline": "",
+            "flight_type": "Direct",
+            "departure_city": "{source_location}",
+            "arrival_city": "{top_destination}",
+            "estimated_price_per_person_{currency_code}": 0,
+            "total_price_{currency_code}": 0,
+            "duration": "",
+            "stops": 0
+        }}
+    ]
+}}
+""",
+        expected_output="JSON with flight options",
+        agent=flight_agent
+    )
     t_plan = Task(
         description=f"""
 Create vacation plan for {top_destination}, {top_country}.
 From: {source_location}. Category: {category}. Total Budget: {currency_symbol}{budget_user}. People: {num_people}. Days: {duration}. Season: {season}.
-Use hotels from previous task. No flights needed.
+Use hotels and flights from previous tasks.
 All costs in {currency_name}.
 
 BUDGET RULES:
@@ -381,6 +425,7 @@ Return ONLY this JSON:
     "currency_name": "{currency_name}",
     "currency_code": "{currency_code}",
     "weather_summary": "",
+    "flights": [],
     "hotels": [],
     "day_by_day": [{{"day": 1, "title": "", "activities": []}}],
     "total_budget_{currency_code}": {budget_user},
@@ -395,13 +440,13 @@ Return ONLY this JSON:
 """,
         expected_output="Complete vacation plan JSON",
         agent=final_planner_agent,
-        context=[t_hotels]
+        context=[t_hotels, t_flights]
     )
 
     crew = Crew(
-        agents=[hotel_agent, final_planner_agent],
-        tasks=[t_hotels, t_plan],
-        verbose=False
+    agents=[hotel_agent, flight_agent, final_planner_agent],
+    tasks=[t_hotels, t_flights, t_plan],
+    verbose=False
     )
 
     result = run_crew_with_retry(crew)
@@ -428,10 +473,26 @@ Return ONLY this JSON:
     else:
         actual_hotel_cost = hotel_budget
 
-    actual_activities = round(budget_user - actual_hotel_cost)
+    flights_in_plan = plan.get("flights", [])
+
+    if flights_in_plan:
+        first_flight = flights_in_plan[0]
+        actual_flight_cost = float(
+            first_flight.get(f"total_price_{currency_code}", estimated_flight_budget)
+        )
+
+        if actual_flight_cost == 0:
+            actual_flight_cost = estimated_flight_budget
+    else:
+        actual_flight_cost = estimated_flight_budget
+
+    actual_activities = round(budget_user - actual_hotel_cost - actual_flight_cost)
 
     plan[total_key] = budget_user
+    flights_key = f"flights_{currency_code}"
+
     plan["budget_breakdown"] = {
+        flights_key: actual_flight_cost,
         hotels_key: actual_hotel_cost,
         activities_key: actual_activities
     }

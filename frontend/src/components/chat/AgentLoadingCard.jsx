@@ -9,6 +9,7 @@ const STEP_SETS = {
   ],
   planning: [
     'Searching hotels',
+    'Searching available flights',
     'Building day-by-day itinerary',
     'Finalizing your vacation plan',
   ],

@@ -4,10 +4,11 @@ import { getTotalBudget, getBudgetBreakdown } from '../../utils/planHelpers';
 export default function BudgetBreakdown({ plan }) {
   const sym = plan?.currency_symbol || '$';
   const total = getTotalBudget(plan);
-  const { hotels, activities } = getBudgetBreakdown(plan);
-  const sum = hotels + activities || 1;
+  const { flights, hotels, activities } = getBudgetBreakdown(plan);
+  const sum = flights + hotels + activities || 1;
 
   const segments = [
+    { label: 'Flights', amount: flights, color: 'bg-blue-400', width: (flights / sum) * 100 },
     { label: 'Hotels', amount: hotels, color: 'bg-primary', width: (hotels / sum) * 100 },
     {
       label: 'Activities & food',
@@ -46,7 +47,7 @@ export default function BudgetBreakdown({ plan }) {
           </div>
         )}
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {segments.map((s) => (
             <div key={s.label} className="rounded-2xl border border-border bg-white p-4">
               <div className={`mb-2 h-1 w-8 rounded ${s.color}`} />
