@@ -79,21 +79,41 @@ async def get_trips():
 
 
 @app.delete("/api/trips/{trip_id}")
-async def delete_trip(trip_id: str):
+def delete_trip(trip_id: str):
     try:
-        print(f"Deleting trip with ID: {trip_id}")
-        result = supabase.table("vacation_plans").select("id").eq("id", trip_id).execute()
-        print(f"Query result: {result.data}")
-        if not result.data:
-            print(f"Trip {trip_id} not found")
+        print(f"[DELETE TRIP] Starting deletion for trip ID: {trip_id}")
+        
+        # Verify the trip exists first
+        query_result = supabase.table("vacation_plans").select("*").eq("id", trip_id).execute()
+        print(f"[DELETE TRIP] Query result data count: {len(query_result.data)}")
+        
+        if not query_result.data:
+            print(f"[DELETE TRIP] Trip {trip_id} not found in database")
             return {"success": False, "error": "Trip not found"}
         
-        delete_result = supabase.table("vacation_plans").delete().eq("id", trip_id).execute()
-        print(f"Delete result: {delete_result}")
+        print(f"[DELETE TRIP] Found trip, attempting to delete...")
+        
+        # Perform the deletion
+        response = supabase.table("vacation_plans").delete().eq("id", trip_id).execute()
+        
+        print(f"[DELETE TRIP] Delete operation completed")
+        print(f"[DELETE TRIP] Response: {response}")
+        
+        # Verify deletion by checking if the trip still exists
+        verify_result = supabase.table("vacation_plans").select("id").eq("id", trip_id).execute()
+        if verify_result.data:
+            print(f"[DELETE TRIP] WARNING: Trip still exists after deletion!")
+            return {"success": False, "error": "Failed to delete trip from database"}
+        
+        print(f"[DELETE TRIP] Verification successful - trip deleted")
         return {"success": True, "message": "Trip deleted successfully"}
+        
     except Exception as e:
-        print(f"Error deleting trip: {str(e)}")
-        return {"success": False, "error": str(e)}
+        import traceback
+        error_msg = str(e)
+        print(f"[DELETE TRIP] ERROR: {error_msg}")
+        print(f"[DELETE TRIP] Traceback: {traceback.format_exc()}")
+        return {"success": False, "error": error_msg}
 
 
 @app.post("/api/chat")
