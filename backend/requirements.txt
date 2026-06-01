@@ -1,6 +1,7 @@
-fastapi
-uvicorn
-python-dotenv
-requests
-supabase
-openai
+fastapi==0.136.3
+uvicorn==0.48.0
+python-dotenv==1.2.2
+requests==2.34.2
+supabase==2.30.0
+openai==2.38.0
+crewai==1.14.5
