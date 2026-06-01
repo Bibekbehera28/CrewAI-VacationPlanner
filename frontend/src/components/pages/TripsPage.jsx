@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { fetchTrips } from '../../services/api';
+import { fetchTrips, deleteTrip } from '../../services/api';
 
 function formatDate(iso) {
   try {
@@ -40,11 +40,65 @@ function normalizeTripRow(row) {
   };
 }
 
+function ConfirmationDialog({ isOpen, title, message, onConfirm, onCancel, isLoading }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="w-full max-w-sm rounded-2xl border border-border bg-white p-6 shadow-lg"
+      >
+        <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+        <p className="mt-2 text-sm text-slate-600">{message}</p>
+        <div className="mt-6 flex gap-3">
+          <button
+            onClick={onCancel}
+            disabled={isLoading}
+            className="flex-1 rounded-lg border border-border bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="flex-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
+          >
+            {isLoading ? 'Deleting...' : 'Delete'}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function Toast({ message, type, isVisible }) {
+  if (!isVisible) return null;
+
+  const bgColor = type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      className={`fixed top-4 right-4 rounded-lg border px-4 py-3 text-sm font-medium ${bgColor} shadow-md`}
+    >
+      {message}
+    </motion.div>
+  );
+}
+
 export default function TripsPage({ onPlanAnotherTrip, onLoadTrip }) {
   const [query, setQuery] = useState('');
   const [remoteTrips, setRemoteTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, tripId: null, tripName: null });
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
 
   useEffect(() => {
     let mounted = true;
@@ -71,6 +125,45 @@ export default function TripsPage({ onPlanAnotherTrip, onLoadTrip }) {
     if (!q) return remoteTrips;
     return remoteTrips.filter((t) => (t.destination || '').toLowerCase().includes(q));
   }, [remoteTrips, query]);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ isVisible: true, message, type });
+    setTimeout(() => setToast({ isVisible: false, message: '', type: 'success' }), 3000);
+  };
+
+  const handleDeleteClick = (e, trip) => {
+    e.stopPropagation();
+    setConfirmDialog({
+      isOpen: true,
+      tripId: trip.id,
+      tripName: trip.destination,
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      console.log('Attempting to delete trip:', confirmDialog.tripId);
+      const response = await deleteTrip(confirmDialog.tripId);
+      console.log('Delete response:', response);
+      if (response.success) {
+        setRemoteTrips(remoteTrips.filter((t) => t.id !== confirmDialog.tripId));
+        showToast('Trip deleted successfully.', 'success');
+      } else {
+        showToast(response.error || 'Failed to delete trip. Please try again.', 'error');
+      }
+    } catch (e) {
+      console.error('Delete error:', e);
+      showToast('Failed to delete trip. Please try again.', 'error');
+    } finally {
+      setIsDeleting(false);
+      setConfirmDialog({ isOpen: false, tripId: null, tripName: null });
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmDialog({ isOpen: false, tripId: null, tripName: null });
+  };
 
   return (
     <motion.div
@@ -114,7 +207,7 @@ export default function TripsPage({ onPlanAnotherTrip, onLoadTrip }) {
 
         {error && (
           <div className="rounded-2xl border border-border bg-card p-4 text-sm text-slate-700">
-            Couldn’t load trips from the server. {error ? <span className="text-slate-500">({error})</span> : null}
+            Couldn't load trips from the server. {error ? <span className="text-slate-500">({error})</span> : null}
           </div>
         )}
 
@@ -126,46 +219,67 @@ export default function TripsPage({ onPlanAnotherTrip, onLoadTrip }) {
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((t) => (
-            <motion.button
+            <motion.div
               key={t.id}
-              type="button"
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.99 }}
-              onClick={() => onLoadTrip?.(t)}
-              className="text-left rounded-2xl border border-border bg-white p-5 transition hover:border-primary/40 hover:shadow-sm"
+              className="rounded-2xl border border-border bg-white p-5 transition hover:border-primary/40 hover:shadow-sm"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-base font-semibold text-slate-900">
-                    {t.destination}
-                    {t.country ? `, ${t.country}` : ''}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-400">{formatDate(t.planned_at)}</p>
+              <button
+                type="button"
+                onClick={() => onLoadTrip?.(t)}
+                className="w-full text-left"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-base font-semibold text-slate-900">
+                      {t.destination}
+                      {t.country ? `, ${t.country}` : ''}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-400">{formatDate(t.planned_at)}</p>
+                  </div>
+                  {t.category && (
+                    <span className={`shrink-0 rounded-xl border px-2.5 py-1 text-xs font-medium ${badgeColor(t.category)}`}>
+                      {t.category}
+                    </span>
+                  )}
                 </div>
-                {t.category && (
-                  <span className={`shrink-0 rounded-xl border px-2.5 py-1 text-xs font-medium ${badgeColor(t.category)}`}>
-                    {t.category}
-                  </span>
-                )}
-              </div>
 
-              <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-xl bg-card p-3">
-                  <p className="text-xs text-slate-500">Budget</p>
-                  <p className="mt-1 font-semibold text-slate-900">
-                    {t.budget != null ? `${t.currency_symbol}${Number(t.budget).toLocaleString()}` : '—'}
-                  </p>
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <div className="rounded-xl bg-card p-3">
+                    <p className="text-xs text-slate-500">Budget</p>
+                    <p className="mt-1 font-semibold text-slate-900">
+                      {t.budget != null ? `${t.currency_symbol}${Number(t.budget).toLocaleString()}` : '—'}
+                    </p>
+                  </div>
+                  <div className="rounded-xl bg-card p-3">
+                    <p className="text-xs text-slate-500">Days</p>
+                    <p className="mt-1 font-semibold text-slate-900">{t.duration_days ?? '—'}</p>
+                  </div>
                 </div>
-                <div className="rounded-xl bg-card p-3">
-                  <p className="text-xs text-slate-500">Days</p>
-                  <p className="mt-1 font-semibold text-slate-900">{t.duration_days ?? '—'}</p>
-                </div>
-              </div>
-            </motion.button>
+              </button>
+
+              <button
+                onClick={(e) => handleDeleteClick(e, t)}
+                className="mt-4 w-full rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 hover:border-red-300"
+              >
+                Delete Trip
+              </button>
+            </motion.div>
           ))}
         </div>
       </div>
+
+      <ConfirmationDialog
+        isOpen={confirmDialog.isOpen}
+        title="Delete Trip"
+        message={`Are you sure you want to delete "${confirmDialog.tripName}"? This action cannot be undone.`}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        isLoading={isDeleting}
+      />
+
+      <Toast isVisible={toast.isVisible} message={toast.message} type={toast.type} />
     </motion.div>
   );
 }
-

@@ -53,4 +53,17 @@ export async function fetchTrips() {
   return data;
 }
 
+/** DELETE /api/trips/{trip_id} */
+export async function deleteTrip(tripId) {
+  try {
+    console.log('Calling deleteTrip API with ID:', tripId);
+    const { data } = await api.delete(`/api/trips/${tripId}`);
+    console.log('deleteTrip API response:', data);
+    return data;
+  } catch (error) {
+    console.error('deleteTrip API error:', error);
+    throw error;
+  }
+}
+
 export default api;
