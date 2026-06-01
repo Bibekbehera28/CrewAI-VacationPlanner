@@ -78,6 +78,24 @@ async def get_trips():
         return {"trips": [], "error": str(e)}
 
 
+@app.delete("/api/trips/{trip_id}")
+async def delete_trip(trip_id: str):
+    try:
+        print(f"Deleting trip with ID: {trip_id}")
+        result = supabase.table("vacation_plans").select("id").eq("id", trip_id).execute()
+        print(f"Query result: {result.data}")
+        if not result.data:
+            print(f"Trip {trip_id} not found")
+            return {"success": False, "error": "Trip not found"}
+        
+        delete_result = supabase.table("vacation_plans").delete().eq("id", trip_id).execute()
+        print(f"Delete result: {delete_result}")
+        return {"success": True, "message": "Trip deleted successfully"}
+    except Exception as e:
+        print(f"Error deleting trip: {str(e)}")
+        return {"success": False, "error": str(e)}
+
+
 @app.post("/api/chat")
 async def chat(body: ChatMessage):
     session_id = body.session_id
