@@ -16,11 +16,11 @@ function formatDate(iso) {
 
 function badgeColor(category) {
   const c = (category || '').toLowerCase();
-  if (c.includes('beach')) return 'bg-teal-50 text-teal-700 border-teal-200';
-  if (c.includes('mount')) return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-  if (c.includes('city')) return 'bg-sky-50 text-sky-700 border-sky-200';
-  if (c.includes('advent')) return 'bg-amber-50 text-amber-800 border-amber-200';
-  return 'bg-slate-50 text-slate-700 border-border';
+  if (c.includes('beach')) return 'bg-teal-50 text-teal-700 border-teal-200 dark:border-[#006239]/40 dark:bg-[#006239]/25 dark:text-[#4ade80]';
+  if (c.includes('mount')) return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:border-[#006239]/40 dark:bg-[#006239]/25 dark:text-[#4ade80]';
+  if (c.includes('city')) return 'bg-sky-50 text-sky-700 border-sky-200 dark:border-[#292929] dark:bg-[#242424] dark:text-[#e2e8f0]';
+  if (c.includes('advent')) return 'bg-amber-50 text-amber-800 border-amber-200 dark:border-[#292929] dark:bg-[#313131] dark:text-[#e2e8f0]';
+  return 'bg-slate-50 text-slate-700 border-border dark:border-[#292929] dark:bg-[#242424] dark:text-[#a2a2a2]';
 }
 
 function normalizeTripRow(row) {
@@ -44,20 +44,20 @@ function ConfirmationDialog({ isOpen, title, message, onConfirm, onCancel, isLoa
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/70">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-sm rounded-2xl border border-border bg-white p-6 shadow-lg"
+        className="w-full max-w-sm rounded-2xl border border-border bg-white p-6 shadow-lg dark:border-[#292929] dark:bg-[#171717]"
       >
-        <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-        <p className="mt-2 text-sm text-slate-600">{message}</p>
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-[#e2e8f0]">{title}</h2>
+        <p className="mt-2 text-sm text-slate-600 dark:text-[#a2a2a2]">{message}</p>
         <div className="mt-6 flex gap-3">
           <button
             onClick={onCancel}
             disabled={isLoading}
-            className="flex-1 rounded-lg border border-border bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+            className="flex-1 rounded-lg border border-border bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50 dark:border-[#292929] dark:bg-[#242424] dark:text-[#e2e8f0] dark:hover:bg-[#313131]"
           >
             Cancel
           </button>
@@ -77,7 +77,9 @@ function ConfirmationDialog({ isOpen, title, message, onConfirm, onCancel, isLoa
 function Toast({ message, type, isVisible }) {
   if (!isVisible) return null;
 
-  const bgColor = type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800';
+  const bgColor = type === 'success'
+  ? 'bg-green-50 border-green-200 text-green-800 dark:bg-[#006239]/20 dark:border-[#006239]/40 dark:text-[#4ade80]'
+  : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400';
 
   return (
     <motion.div
@@ -170,12 +172,12 @@ export default function TripsPage({ onPlanAnotherTrip, onLoadTrip }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 10 }}
-      className="mx-auto flex h-full min-h-0 w-full max-w-5xl flex-col overflow-hidden px-4 py-6 md:px-8"
+      className="mx-auto flex h-full min-h-0 w-full max-w-5xl flex-col overflow-hidden px-4 py-6 md:px-8 dark:text-[#e2e8f0]"
     >
-      <div className="sticky top-0 z-20 flex shrink-0 flex-wrap items-start justify-between gap-4 border-b border-[#eef2f5] bg-white pb-4 pt-1">
+      <div className="sticky top-0 z-20 flex shrink-0 flex-wrap items-start justify-between gap-4 border-b border-[#eef2f5] bg-white pb-4 pt-1 dark:border-[#292929] dark:bg-[#121212]">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 md:text-3xl">My Trips</h1>
-          <div className="mt-3 flex items-center gap-2 rounded-2xl border border-border bg-white px-4 py-3 shadow-sm transition focus-within:border-primary">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-[#e2e8f0] md:text-3xl">My Trips</h1>
+          <div className="mt-3 flex items-center gap-2 rounded-2xl border border-border bg-white px-4 py-3 shadow-sm transition focus-within:border-primary dark:border-[#292929] dark:bg-[#242424] dark:focus-within:border-[#4ade80]">
             <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -183,14 +185,14 @@ export default function TripsPage({ onPlanAnotherTrip, onLoadTrip }) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search trips by destination..."
-              className="min-w-0 flex-1 bg-transparent text-sm outline-none"
+              className="min-w-0 flex-1 bg-transparent text-sm outline-none dark:text-[#e2e8f0] dark:placeholder:text-[#a2a2a2]"
             />
           </div>
         </div>
         <button
           type="button"
           onClick={onPlanAnotherTrip}
-          className="rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+          className="rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 dark:bg-[#006239] dark:text-[#e2e8f0] dark:hover:bg-[#007a46]"
         >
           Plan Another Trip
         </button>
@@ -206,13 +208,13 @@ export default function TripsPage({ onPlanAnotherTrip, onLoadTrip }) {
         </AnimatePresence>
 
         {error && (
-          <div className="rounded-2xl border border-border bg-card p-4 text-sm text-slate-700">
+          <div className="rounded-2xl border border-border bg-card p-4 text-sm text-slate-700 dark:border-[#292929] dark:bg-[#171717] dark:text-[#a2a2a2]">
             Couldn't load trips from the server. {error ? <span className="text-slate-500">({error})</span> : null}
           </div>
         )}
 
         {!loading && !filtered?.length && (
-          <div className="rounded-2xl border border-border bg-card p-6 text-sm text-slate-600">
+          <div className="rounded-2xl border border-border bg-card p-6 text-sm text-slate-600 dark:border-[#292929] dark:bg-[#171717] dark:text-[#a2a2a2]">
             No trips found.
           </div>
         )}
@@ -223,7 +225,7 @@ export default function TripsPage({ onPlanAnotherTrip, onLoadTrip }) {
               key={t.id}
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.99 }}
-              className="rounded-2xl border border-border bg-white p-5 transition hover:border-primary/40 hover:shadow-sm"
+              className="rounded-2xl border border-border bg-white p-5 transition hover:border-primary/40 hover:shadow-sm dark:border-[#292929] dark:bg-[#171717] dark:hover:border-[#006239]/40"
             >
               <button
                 type="button"
@@ -232,11 +234,11 @@ export default function TripsPage({ onPlanAnotherTrip, onLoadTrip }) {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-base font-semibold text-slate-900">
+                    <p className="text-base font-semibold text-slate-900 dark:text-[#e2e8f0]">
                       {t.destination}
                       {t.country ? `, ${t.country}` : ''}
                     </p>
-                    <p className="mt-1 text-xs text-slate-400">{formatDate(t.planned_at)}</p>
+                    <p className="mt-1 text-xs text-slate-400 dark:text-[#a2a2a2]">{formatDate(t.planned_at)}</p>
                   </div>
                   {t.category && (
                     <span className={`shrink-0 rounded-xl border px-2.5 py-1 text-xs font-medium ${badgeColor(t.category)}`}>
@@ -246,22 +248,22 @@ export default function TripsPage({ onPlanAnotherTrip, onLoadTrip }) {
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                  <div className="rounded-xl bg-card p-3">
-                    <p className="text-xs text-slate-500">Budget</p>
-                    <p className="mt-1 font-semibold text-slate-900">
+                  <div className="rounded-xl bg-card p-3 dark:bg-[#242424]">
+                    <p className="text-xs text-slate-500 dark:text-[#a2a2a2]">Budget</p>
+                    <p className="mt-1 font-semibold text-slate-900 dark:text-[#e2e8f0]">
                       {t.budget != null ? `${t.currency_symbol}${Number(t.budget).toLocaleString()}` : '—'}
                     </p>
                   </div>
-                  <div className="rounded-xl bg-card p-3">
-                    <p className="text-xs text-slate-500">Days</p>
-                    <p className="mt-1 font-semibold text-slate-900">{t.duration_days ?? '—'}</p>
+                  <div className="rounded-xl bg-card p-3 dark:bg-[#242424]">
+                    <p className="text-xs text-slate-500 dark:text-[#a2a2a2]">Days</p>
+                    <p className="mt-1 font-semibold text-slate-900 dark:text-[#e2e8f0]">{t.duration_days ?? '—'}</p>
                   </div>
                 </div>
               </button>
 
               <button
                 onClick={(e) => handleDeleteClick(e, t)}
-                className="mt-4 w-full rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 hover:border-red-300"
+                className="mt-4 w-full rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 hover:border-red-300 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50 dark:hover:border-red-800/60"
               >
                 Delete Trip
               </button>

@@ -33,7 +33,7 @@ export default function ChatThread({
       )}
       {isLoading && !showAgentCard && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-          <div className="rounded-2xl border border-border bg-card px-4 py-3 text-sm text-slate-500">
+          <div className="rounded-2xl border border-border bg-card px-4 py-3 text-sm text-slate-500 dark:border-[#292929] dark:bg-[#171717] dark:text-[#a2a2a2]">
             <span className="inline-flex gap-1">
               <span className="animate-bounce">·</span>
               <span className="animate-bounce [animation-delay:0.1s]">·</span>

@@ -6,18 +6,18 @@ function DayBlock({ day, sym }) {
   const activities = day.activities || [];
 
   return (
-    <div className="border-b border-border last:border-0">
+    <div className="border-b border-border last:border-0 dark:border-[#292929]">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center gap-4 py-4 text-left"
       >
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white dark:bg-[#006239] dark:text-[#e2e8f0]">
           {day.day}
         </span>
-        <span className="flex-1 font-medium text-slate-800">{day.title || `Day ${day.day}`}</span>
+        <span className="flex-1 font-medium text-slate-800 dark:text-[#e2e8f0]">{day.title || `Day ${day.day}`}</span>
         <svg
-          className={`h-5 w-5 text-slate-400 transition ${open ? 'rotate-180' : ''}`}
+          className={`h-5 w-5 text-slate-400 transition dark:text-[#a2a2a2] ${open ? 'rotate-180' : ''}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -39,11 +39,11 @@ function DayBlock({ day, sym }) {
               return (
                 <li
                   key={i}
-                  className="flex items-start justify-between gap-2 py-1.5 text-sm text-slate-600"
+                  className="flex items-start justify-between gap-2 py-1.5 text-sm text-slate-600 dark:text-[#a2a2a2]"
                 >
                   <span>{label}</span>
                   {cost != null && Number(cost) > 0 && (
-                    <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800">
+                    <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-[#313131] dark:text-[#e2e8f0]">
                       {sym}
                       {Number(cost).toLocaleString()}
                     </span>
@@ -64,8 +64,8 @@ export default function ItineraryTimeline({ dayByDay = [], plan }) {
 
   return (
     <section className="mb-8">
-      <h3 className="mb-4 text-lg font-semibold text-slate-900">Itinerary</h3>
-      <div className="rounded-2xl border border-border bg-white px-4">
+      <h3 className="mb-4 text-lg font-semibold text-slate-900 dark:text-[#e2e8f0]">Itinerary</h3>
+      <div className="rounded-2xl border border-border bg-white px-4 dark:border-[#292929] dark:bg-[#171717]">
         {dayByDay.map((day) => (
           <DayBlock key={day.day} day={day} sym={sym} />
         ))}

@@ -1,6 +1,21 @@
 @import 'tailwindcss';
 @import 'leaflet/dist/leaflet.css';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --dark-background: #121212;
+  --dark-card: #171717;
+  --dark-input: #242424;
+  --dark-muted: #1f1f1f;
+  --dark-accent: #313131;
+  --dark-border: #292929;
+  --dark-primary: #006239;
+  --dark-success: #4ade80;
+  --dark-text-primary: #e2e8f0;
+  --dark-text-secondary: #a2a2a2;
+}
+
 @theme {
   --color-primary: #1a3c34;
   --color-primary-light: #2d5a4f;
@@ -28,9 +43,25 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.dark body {
+  background: var(--dark-background);
+  color: var(--dark-text-primary);
+}
+
 .leaflet-container {
   font-family: inherit;
   z-index: 0;
+}
+
+.dark .leaflet-container {
+  background: var(--dark-card);
+}
+
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+  background: var(--dark-input);
+  color: var(--dark-text-primary);
+  border: 1px solid var(--dark-border);
 }
 
 @media print {

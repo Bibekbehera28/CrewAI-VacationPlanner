@@ -33,9 +33,9 @@ export default function AgentLoadingCard({ mode = 'planning' }) {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border bg-card p-4 shadow-sm"
+      className="rounded-2xl border border-border bg-card p-4 shadow-sm dark:border-[#292929] dark:bg-[#171717] dark:shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
     >
-      <p className="mb-3 text-sm font-semibold text-primary">{title}</p>
+      <p className="mb-3 text-sm font-semibold text-primary dark:text-[#4ade80]">{title}</p>
       <ul className="space-y-3">
         {steps.map((label, i) => {
           const done = i < activeStep;
@@ -49,10 +49,10 @@ export default function AgentLoadingCard({ mode = 'planning' }) {
               <span
                 className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition ${
                   done
-                    ? 'bg-primary text-white'
+                    ? 'bg-primary text-white dark:bg-[#006239] dark:text-[#e2e8f0]'
                     : active
-                      ? 'bg-primary/15 text-primary ring-2 ring-primary'
-                      : 'bg-slate-100 text-slate-400'
+                      ? 'bg-primary/15 text-primary ring-2 ring-primary dark:bg-[#006239]/25 dark:text-[#4ade80] dark:ring-[#4ade80]'
+                      : 'bg-slate-100 text-slate-400 dark:bg-[#242424] dark:text-[#a2a2a2]'
                 }`}
               >
                 {done ? (
@@ -63,7 +63,7 @@ export default function AgentLoadingCard({ mode = 'planning' }) {
                   i + 1
                 )}
               </span>
-              <span className={`text-sm ${active ? 'font-medium text-primary' : 'text-slate-600'}`}>
+              <span className={`text-sm ${active ? 'font-medium text-primary dark:text-[#4ade80]' : 'text-slate-600 dark:text-[#a2a2a2]'}`}>
                 {label}
               </span>
             </motion.li>

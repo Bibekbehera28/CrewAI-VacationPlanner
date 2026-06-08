@@ -12,6 +12,7 @@ import DestinationCards from './components/plan/DestinationCards';
 import TripsPage from './components/pages/TripsPage';
 import AboutPage from './components/pages/AboutPage';
 import useGeolocation from './hooks/useGeolocation';
+import { BackgroundCircles } from './components/background/background-circles';
 import {
   sendMessage,
   selectDestination,
@@ -28,9 +29,22 @@ import {
 } from './utils/localStorage';
 import { willFetchDestinations, getCurrencyCode } from './utils/planHelpers';
 
+const THEME_KEY = 'voyageai_theme';
+
+function getInitialTheme() {
+  try {
+    const stored = localStorage.getItem(THEME_KEY);
+    if (stored === 'dark' || stored === 'light') return stored;
+  } catch {
+    /* ignore storage access issues */
+  }
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
 function App() {
   const { city: geoCity, loading: geoLoading } = useGeolocation();
 
+  const [theme, setTheme] = useState(getInitialTheme);
   const [sessionId, setSessionId] = useState(() => getSessionId() || uuidv4());
   const [messages, setMessages] = useState([]);
   const [currentPlan, setCurrentPlan] = useState(null);
@@ -51,6 +65,15 @@ function App() {
   useEffect(() => {
     saveSessionId(sessionId);
   }, [sessionId]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem(THEME_KEY, theme);
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((current) => (current === 'dark' ? 'light' : 'dark'));
+  }, []);
 
   const resetConversation = useCallback((newSession = true) => {
     if (newSession) {
@@ -367,15 +390,22 @@ function App() {
   const showWelcome = !conversationStarted && !currentPlan;
 
   return (
-    <div className="flex h-screen min-h-0 flex-col overflow-hidden bg-white">
-      <Toaster position="top-center" toastOptions={{ className: 'text-sm' }} />
+    <div className="flex h-screen min-h-0 flex-col overflow-hidden bg-white transition-colors duration-300 dark:bg-[#121212] dark:text-[#e2e8f0]">
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          className: 'text-sm dark:!border dark:!border-[#292929] dark:!bg-[#242424] dark:!text-[#e2e8f0]',
+        }}
+      />
       <Navbar
         onAbout={() => setActivePage('about')}
         onToggleSidebar={() => setSidebarOpen((open) => !open)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {!geoLoading && !sourceLocation && conversationStarted && (
-        <p className="no-print bg-amber-50 px-4 py-2 text-center text-xs text-amber-800">
+        <p className="no-print bg-amber-50 px-4 py-2 text-center text-xs text-amber-800 dark:bg-[#242424] dark:text-[#a2a2a2]">
           Location access denied — the assistant may ask which city you&apos;re traveling from.
         </p>
       )}
@@ -399,8 +429,15 @@ function App() {
           activeRecentSessionId={sessionId}
         />
 
-        <main className="flex min-w-0 flex-1 flex-col bg-white">
-          <AnimatePresence mode="wait">
+        <main className="relative flex min-w-0 flex-1 flex-col bg-white transition-colors duration-300 dark:bg-[#121212]">
+  {/* Background animation — subtle atmospheric layer */}
+  {showWelcome && activePage === 'chat' && (
+  <div className="absolute inset-0 z-0 pointer-events-none opacity-60 dark:opacity-100">
+    <BackgroundCircles className="!bg-transparent" />
+  </div>
+  )}
+  <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-hidden">
+  <AnimatePresence mode="wait">
             {activePage === 'about' && (
               <div key="about" className="min-h-0 flex-1 overflow-y-auto">
                 <AboutPage
@@ -463,7 +500,7 @@ function App() {
                     </div>
                   ) : (
                     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-                      <div className="flex-1 overflow-y-auto px-3 py-4 md:px-6">
+                      <div className="flex-1 overflow-y-auto px-3 py-4 transition-colors duration-300 dark:bg-[#121212] md:px-6">
                         <div className="mx-auto w-full max-w-[800px]">
                           <ChatThread messages={messages} isLoading={isLoading} loadingMode={loadingMode} />
 
@@ -495,7 +532,7 @@ function App() {
                         </div>
                       </div>
 
-                      <div className="sticky bottom-0 z-10 shrink-0 border-t border-border bg-white/95 p-4 backdrop-blur">
+                      <div className="sticky bottom-0 z-10 shrink-0 border-t border-border bg-white/95 p-4 backdrop-blur transition-colors duration-300 dark:border-[#292929] dark:bg-[#121212]/90">
                         <div className="mx-auto w-full max-w-[800px]">
                           <ChatInput
                             onSend={handleSend}
@@ -519,6 +556,7 @@ function App() {
               </motion.div>
             )}
           </AnimatePresence>
+        </div> {/* closes relative z-10 wrapper */}
         </main>
       </div>
     </div>

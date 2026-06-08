@@ -24,7 +24,7 @@ export default function ChatInput({
 
   return (
     <div
-      className={`flex items-center gap-2 rounded-2xl border border-border bg-white p-2 shadow-sm transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 ${
+      className={`flex items-center gap-2 rounded-2xl border border-border bg-white p-2 shadow-sm transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 dark:border-[#292929] dark:bg-[#242424] dark:shadow-[0_10px_28px_rgba(0,0,0,0.22)] dark:focus-within:border-[#4ade80] dark:focus-within:ring-[#4ade80]/15 ${
         size === 'lg' ? 'px-3 py-2.5' : ''
       }`}
     >
@@ -35,7 +35,7 @@ export default function ChatInput({
         onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && submit()}
         placeholder={disabled && disabledText ? disabledText : placeholder}
-        className={`min-w-0 flex-1 bg-transparent px-3 outline-none disabled:opacity-60 ${
+        className={`min-w-0 flex-1 bg-transparent px-3 outline-none disabled:opacity-60 dark:text-[#e2e8f0] dark:placeholder:text-[#a2a2a2] ${
           size === 'lg' ? 'py-3 text-base' : 'py-2 text-sm'
         }`}
       />
@@ -45,7 +45,7 @@ export default function ChatInput({
         whileTap={{ scale: 0.95 }}
         disabled={disabled || !text.trim()}
         onClick={submit}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-white disabled:opacity-40"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-white disabled:opacity-40 dark:bg-[#006239] dark:text-[#e2e8f0] dark:hover:bg-[#007a46]"
         aria-label="Send message"
       >
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

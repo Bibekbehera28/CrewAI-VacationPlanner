@@ -9,7 +9,7 @@ function IconButton({ title, onClick, children, active = false }) {
       aria-label={title}
       onClick={onClick}
       className={`flex h-10 w-10 items-center justify-center rounded-xl transition ${
-        active ? 'bg-primary/10 text-primary' : 'text-slate-500 hover:bg-card hover:text-primary'
+        active ? 'bg-primary/10 text-primary dark:bg-[#006239]/25 dark:text-[#4ade80]' : 'text-slate-500 hover:bg-card hover:text-primary dark:text-[#a2a2a2] dark:hover:bg-[#242424] dark:hover:text-[#e2e8f0]'
       }`}
     >
       {children}
@@ -63,7 +63,7 @@ export default function ClaudeSidebar({
         layout
         animate={{ width: isOpen ? 240 : 60 }}
         transition={{ type: 'spring', stiffness: 320, damping: 34 }}
-        className="no-print relative z-30 hidden h-full shrink-0 overflow-hidden border-r border-border bg-white shadow-sm md:flex md:flex-col"
+        className="no-print relative z-30 hidden h-full shrink-0 overflow-hidden border-r border-border bg-white shadow-sm transition-colors duration-300 dark:border-[#292929] dark:bg-[#121212] dark:shadow-[8px_0_24px_rgba(0,0,0,0.18)] md:flex md:flex-col"
       >
         <div className="flex min-h-0 w-full flex-1 flex-col items-center gap-2 pt-1">
           {!isOpen ? (
@@ -100,11 +100,11 @@ export default function ClaudeSidebar({
           ) : (
             <div ref={panelRef} className="flex min-h-0 h-full w-full flex-col px-3 pb-3 pt-1">
               <div className="flex items-center justify-between px-2 pb-2">
-                <p className="text-xs font-semibold tracking-wide text-slate-500">VoyageAI</p>
+                <p className="text-xs font-semibold tracking-wide text-slate-500 dark:text-[#a2a2a2]">VoyageAI</p>
                 <button
                   type="button"
                   onClick={closeAndReset}
-                  className="rounded-lg p-1.5 text-slate-500 transition hover:bg-card hover:text-primary"
+                  className="rounded-lg p-1.5 text-slate-500 transition hover:bg-card hover:text-primary dark:text-[#a2a2a2] dark:hover:bg-[#242424] dark:hover:text-[#e2e8f0]"
                   aria-label="Close sidebar"
                 >
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -116,7 +116,7 @@ export default function ClaudeSidebar({
                 <button
                   type="button"
                   onClick={onNewChat}
-                  className="flex w-full items-center gap-3 rounded-[10px] border border-[#eef2f5] bg-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition duration-200 hover:border-[#e3e7eb] hover:bg-[#f7f8fa] hover:text-primary"
+                  className="flex w-full items-center gap-3 rounded-[10px] border border-[#eef2f5] bg-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition duration-200 hover:border-[#e3e7eb] hover:bg-[#f7f8fa] hover:text-primary dark:border-[#292929] dark:text-[#e2e8f0] dark:hover:border-[#313131] dark:hover:bg-[#242424] dark:hover:text-[#4ade80]"
                 >
                   <svg className="h-5 w-5 shrink-0 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -130,7 +130,7 @@ export default function ClaudeSidebar({
                     setTimeout(() => panelRef.current?.querySelector('input')?.focus(), 0);
                     onSearch?.();
                   }}
-                  className="flex w-full items-center gap-3 rounded-[10px] border border-[#eef2f5] bg-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition duration-200 hover:border-[#e3e7eb] hover:bg-[#f7f8fa] hover:text-primary"
+                  className="flex w-full items-center gap-3 rounded-[10px] border border-[#eef2f5] bg-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition duration-200 hover:border-[#e3e7eb] hover:bg-[#f7f8fa] hover:text-primary dark:border-[#292929] dark:text-[#e2e8f0] dark:hover:border-[#313131] dark:hover:bg-[#242424] dark:hover:text-[#4ade80]"
                 >
                   <svg className="h-5 w-5 shrink-0 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -140,7 +140,7 @@ export default function ClaudeSidebar({
                 <button
                   type="button"
                   onClick={onMyTrips}
-                  className="flex w-full items-center gap-3 rounded-[10px] border border-[#eef2f5] bg-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition duration-200 hover:border-[#e3e7eb] hover:bg-[#f7f8fa] hover:text-primary"
+                  className="flex w-full items-center gap-3 rounded-[10px] border border-[#eef2f5] bg-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition duration-200 hover:border-[#e3e7eb] hover:bg-[#f7f8fa] hover:text-primary dark:border-[#292929] dark:text-[#e2e8f0] dark:hover:border-[#313131] dark:hover:bg-[#242424] dark:hover:text-[#4ade80]"
                 >
                   <svg className="h-5 w-5 shrink-0 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 7h12l-1 14H7L6 7zM9 7V6a3 3 0 016 0v1" />
@@ -150,12 +150,12 @@ export default function ClaudeSidebar({
               </div>
 
               <div className="px-2 pt-4">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Recents</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-[#a2a2a2]">Recents</p>
               </div>
 
               {searchMode && (
                 <div className="pt-2">
-                  <div className="flex items-center gap-2 rounded-xl border border-border bg-white px-3 py-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
+                  <div className="flex items-center gap-2 rounded-xl border border-border bg-white px-3 py-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 dark:border-[#292929] dark:bg-[#242424] dark:focus-within:border-[#4ade80] dark:focus-within:ring-[#4ade80]/15">
                     <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
@@ -163,7 +163,7 @@ export default function ClaudeSidebar({
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder="Search destinations..."
-                      className="min-w-0 flex-1 bg-transparent text-sm outline-none"
+                      className="min-w-0 flex-1 bg-transparent text-sm outline-none dark:text-[#e2e8f0] dark:placeholder:text-[#a2a2a2]"
                     />
                     <button
                       type="button"
@@ -171,7 +171,7 @@ export default function ClaudeSidebar({
                         setQuery('');
                         setSearchMode(false);
                       }}
-                      className="rounded-lg p-1 text-slate-400 transition hover:bg-card hover:text-primary"
+                      className="rounded-lg p-1 text-slate-400 transition hover:bg-card hover:text-primary dark:hover:bg-[#313131] dark:hover:text-[#e2e8f0]"
                       aria-label="Close search"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -184,7 +184,7 @@ export default function ClaudeSidebar({
 
               <div className="min-h-0 flex-1 overflow-y-auto px-1 py-2">
                 {!filteredRecents?.length ? (
-                  <div className="px-2 py-6 text-sm text-slate-500">
+                  <div className="px-2 py-6 text-sm text-slate-500 dark:text-[#a2a2a2]">
                     {query.trim() ? 'No matches.' : 'No recent chats yet.'}
                   </div>
                 ) : (
@@ -194,8 +194,8 @@ export default function ClaudeSidebar({
                         <div
                           className={`group flex items-center gap-2 rounded-xl border px-2 py-1 transition ${
                             activeRecentSessionId && activeRecentSessionId === r.session_id
-                              ? 'border-[#e5e7eb] bg-[#f3f4f6]'
-                              : 'border-transparent hover:bg-[#f8fafc]'
+                              ? 'border-[#e5e7eb] bg-[#f3f4f6] dark:border-[#4ade80]/30 dark:bg-[#006239]/20'
+                              : 'border-transparent hover:bg-[#f8fafc] dark:hover:bg-[#242424]'
                           }`}
                         >
                           <button
@@ -206,14 +206,14 @@ export default function ClaudeSidebar({
                             <p
                               className={`truncate text-sm font-medium ${
                                 activeRecentSessionId && activeRecentSessionId === r.session_id
-                                  ? 'text-slate-900'
-                                  : 'text-slate-800'
+                                  ? 'text-slate-900 dark:text-[#e2e8f0]'
+                                  : 'text-slate-800 dark:text-[#e2e8f0]'
                               }`}
                             >
                               {r.destination}
                               {r.country ? `, ${r.country}` : ''}
                             </p>
-                            <p className="text-xs text-slate-400">{formatPlannedAt(r.planned_at)}</p>
+                            <p className="text-xs text-slate-400 dark:text-[#a2a2a2]">{formatPlannedAt(r.planned_at)}</p>
                           </button>
                           <button
                             type="button"
@@ -221,7 +221,7 @@ export default function ClaudeSidebar({
                               const ok = window.confirm('Delete this trip?');
                               if (ok) onDeleteRecent?.(r);
                             }}
-                            className="rounded-lg p-1.5 text-slate-400 opacity-0 transition duration-200 hover:bg-white hover:text-red-600 group-hover:opacity-100"
+                            className="rounded-lg p-1.5 text-slate-400 opacity-0 transition duration-200 hover:bg-white hover:text-red-600 group-hover:opacity-100 dark:hover:bg-[#313131] dark:hover:text-red-300"
                             aria-label={`Delete ${r.destination || 'trip'}`}
                             title="Delete trip"
                           >
@@ -247,7 +247,7 @@ export default function ClaudeSidebar({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black/30 md:hidden"
+              className="fixed inset-0 z-40 bg-black/30 dark:bg-black/60 md:hidden"
               onClick={closeAndReset}
             />
             <motion.aside
@@ -256,14 +256,14 @@ export default function ClaudeSidebar({
               animate={{ x: 0 }}
               exit={{ x: -240 }}
               transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-              className="no-print fixed left-0 top-0 z-50 flex h-full w-[240px] flex-col border-r border-border bg-white shadow-xl md:hidden"
+              className="no-print fixed left-0 top-0 z-50 flex h-full w-[240px] flex-col border-r border-border bg-white shadow-xl dark:border-[#292929] dark:bg-[#121212] md:hidden"
             >
               <div className="flex items-center justify-between px-3 py-2">
-                <p className="text-xs font-semibold tracking-wide text-slate-500">VoyageAI</p>
+                <p className="text-xs font-semibold tracking-wide text-slate-500 dark:text-[#a2a2a2]">VoyageAI</p>
                 <button
                   type="button"
                   onClick={closeAndReset}
-                  className="rounded-xl p-2 text-slate-500 transition hover:bg-card hover:text-primary"
+                  className="rounded-xl p-2 text-slate-500 transition hover:bg-card hover:text-primary dark:text-[#a2a2a2] dark:hover:bg-[#242424] dark:hover:text-[#e2e8f0]"
                   aria-label="Close sidebar"
                 >
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -276,7 +276,7 @@ export default function ClaudeSidebar({
                 <button
                   type="button"
                   onClick={onNewChat}
-                  className="flex w-full items-center gap-3 rounded-[10px] border border-[#eef2f5] bg-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition duration-200 hover:border-[#e3e7eb] hover:bg-[#f7f8fa] hover:text-primary"
+                  className="flex w-full items-center gap-3 rounded-[10px] border border-[#eef2f5] bg-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition duration-200 hover:border-[#e3e7eb] hover:bg-[#f7f8fa] hover:text-primary dark:border-[#292929] dark:text-[#e2e8f0] dark:hover:border-[#313131] dark:hover:bg-[#242424] dark:hover:text-[#4ade80]"
                 >
                   <svg className="h-5 w-5 shrink-0 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -290,7 +290,7 @@ export default function ClaudeSidebar({
                     setTimeout(() => panelRef.current?.querySelector('input')?.focus(), 0);
                     onSearch?.();
                   }}
-                  className="flex w-full items-center gap-3 rounded-[10px] border border-[#eef2f5] bg-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition duration-200 hover:border-[#e3e7eb] hover:bg-[#f7f8fa] hover:text-primary"
+                  className="flex w-full items-center gap-3 rounded-[10px] border border-[#eef2f5] bg-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition duration-200 hover:border-[#e3e7eb] hover:bg-[#f7f8fa] hover:text-primary dark:border-[#292929] dark:text-[#e2e8f0] dark:hover:border-[#313131] dark:hover:bg-[#242424] dark:hover:text-[#4ade80]"
                 >
                   <svg className="h-5 w-5 shrink-0 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -300,7 +300,7 @@ export default function ClaudeSidebar({
                 <button
                   type="button"
                   onClick={onMyTrips}
-                  className="flex w-full items-center gap-3 rounded-[10px] border border-[#eef2f5] bg-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition duration-200 hover:border-[#e3e7eb] hover:bg-[#f7f8fa] hover:text-primary"
+                  className="flex w-full items-center gap-3 rounded-[10px] border border-[#eef2f5] bg-transparent px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition duration-200 hover:border-[#e3e7eb] hover:bg-[#f7f8fa] hover:text-primary dark:border-[#292929] dark:text-[#e2e8f0] dark:hover:border-[#313131] dark:hover:bg-[#242424] dark:hover:text-[#4ade80]"
                 >
                   <svg className="h-5 w-5 shrink-0 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 7h12l-1 14H7L6 7zM9 7V6a3 3 0 016 0v1" />
@@ -317,7 +317,7 @@ export default function ClaudeSidebar({
 
               {searchMode && (
                 <div className="px-3 pt-2">
-                  <div className="flex items-center gap-2 rounded-xl border border-border bg-white px-3 py-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
+                  <div className="flex items-center gap-2 rounded-xl border border-border bg-white px-3 py-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15 dark:border-[#292929] dark:bg-[#242424] dark:focus-within:border-[#4ade80] dark:focus-within:ring-[#4ade80]/15">
                     <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
@@ -325,7 +325,7 @@ export default function ClaudeSidebar({
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder="Search destinations..."
-                      className="min-w-0 flex-1 bg-transparent text-sm outline-none"
+                      className="min-w-0 flex-1 bg-transparent text-sm outline-none dark:text-[#e2e8f0] dark:placeholder:text-[#a2a2a2]"
                     />
                     <button
                       type="button"
@@ -333,7 +333,7 @@ export default function ClaudeSidebar({
                         setQuery('');
                         setSearchMode(false);
                       }}
-                      className="rounded-lg p-1 text-slate-400 hover:bg-card hover:text-primary"
+                      className="rounded-lg p-1 text-slate-400 hover:bg-card hover:text-primary dark:hover:bg-[#313131] dark:hover:text-[#e2e8f0]"
                       aria-label="Close search"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -346,7 +346,7 @@ export default function ClaudeSidebar({
 
               <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
                 {!filteredRecents?.length ? (
-                  <div className="px-2 py-6 text-sm text-slate-500">
+                  <div className="px-2 py-6 text-sm text-slate-500 dark:text-[#a2a2a2]">
                     {query.trim() ? 'No matches.' : 'No recent chats yet.'}
                   </div>
                 ) : (
@@ -356,8 +356,8 @@ export default function ClaudeSidebar({
                         <div
                           className={`group flex items-center gap-2 rounded-xl border px-2 py-1 transition ${
                             activeRecentSessionId && activeRecentSessionId === r.session_id
-                              ? 'border-[#e5e7eb] bg-[#f3f4f6]'
-                              : 'border-transparent hover:bg-[#f8fafc]'
+                              ? 'border-[#e5e7eb] bg-[#f3f4f6] dark:border-[#4ade80]/30 dark:bg-[#006239]/20'
+                              : 'border-transparent hover:bg-[#f8fafc] dark:hover:bg-[#242424]'
                           }`}
                         >
                           <button
@@ -368,14 +368,14 @@ export default function ClaudeSidebar({
                             <p
                               className={`truncate text-sm font-medium ${
                                 activeRecentSessionId && activeRecentSessionId === r.session_id
-                                  ? 'text-slate-900'
-                                  : 'text-slate-800'
+                                  ? 'text-slate-900 dark:text-[#e2e8f0]'
+                                  : 'text-slate-800 dark:text-[#e2e8f0]'
                               }`}
                             >
                               {r.destination}
                               {r.country ? `, ${r.country}` : ''}
                             </p>
-                            <p className="text-xs text-slate-400">{formatPlannedAt(r.planned_at)}</p>
+                            <p className="text-xs text-slate-400 dark:text-[#a2a2a2]">{formatPlannedAt(r.planned_at)}</p>
                           </button>
                           <button
                             type="button"
@@ -383,7 +383,7 @@ export default function ClaudeSidebar({
                               const ok = window.confirm('Delete this trip?');
                               if (ok) onDeleteRecent?.(r);
                             }}
-                            className="rounded-lg p-1.5 text-slate-400 opacity-0 transition duration-200 hover:bg-white hover:text-red-600 group-hover:opacity-100"
+                            className="rounded-lg p-1.5 text-slate-400 opacity-0 transition duration-200 hover:bg-white hover:text-red-600 group-hover:opacity-100 dark:hover:bg-[#313131] dark:hover:text-red-300"
                             aria-label={`Delete ${r.destination || 'trip'}`}
                             title="Delete trip"
                           >

@@ -48,24 +48,24 @@ export default function PlanDisplay({
         />
       )}
 
-      <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#1A3C34] to-teal-600 p-6 text-white">
+      <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#1A3C34] to-teal-600 p-6 text-white dark:from-[#171717] dark:via-[#1f1f1f] dark:to-[#006239] dark:text-[#e2e8f0] dark:shadow-[0_12px_32px_rgba(0,0,0,0.24)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold">{plan.destination}</h2>
-            <p className="text-white/90">{plan.country}</p>
+            <p className="text-white/90 dark:text-[#a2a2a2]">{plan.country}</p>
           </div>
           {plan.season && (
-            <span className="rounded-2xl bg-white/20 px-3 py-1 text-sm">{plan.season}</span>
+            <span className="rounded-2xl bg-white/20 px-3 py-1 text-sm dark:bg-[#242424] dark:text-[#4ade80]">{plan.season}</span>
           )}
         </div>
-        <div className="mt-4 flex flex-wrap gap-4 text-sm text-white/90">
+        <div className="mt-4 flex flex-wrap gap-4 text-sm text-white/90 dark:text-[#a2a2a2]">
           <span>From {plan.departure_city}</span>
           {plan.weather_summary && <span>· {plan.weather_summary}</span>}
         </div>
       </div>
 
       <div className="mb-8">
-        <h3 className="mb-3 text-lg font-semibold text-slate-900">Map</h3>
+        <h3 className="mb-3 text-lg font-semibold text-slate-900 dark:text-[#e2e8f0]">Map</h3>
         <MapView destination={plan.destination} hotels={plan.hotels} plan={plan} />
       </div>
 
@@ -77,15 +77,15 @@ export default function PlanDisplay({
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2">
         {plan.visa_info && (
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <h4 className="font-semibold text-slate-900">Visa info</h4>
-            <p className="mt-2 text-sm text-slate-600">{plan.visa_info}</p>
+          <div className="rounded-2xl border border-border bg-card p-4 dark:border-[#292929] dark:bg-[#171717]">
+            <h4 className="font-semibold text-slate-900 dark:text-[#e2e8f0]">Visa info</h4>
+            <p className="mt-2 text-sm text-slate-600 dark:text-[#a2a2a2]">{plan.visa_info}</p>
           </div>
         )}
         {plan.best_time_to_visit && (
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <h4 className="font-semibold text-slate-900">Best time to visit</h4>
-            <p className="mt-2 text-sm text-slate-600">{plan.best_time_to_visit}</p>
+          <div className="rounded-2xl border border-border bg-card p-4 dark:border-[#292929] dark:bg-[#171717]">
+            <h4 className="font-semibold text-slate-900 dark:text-[#e2e8f0]">Best time to visit</h4>
+            <p className="mt-2 text-sm text-slate-600 dark:text-[#a2a2a2]">{plan.best_time_to_visit}</p>
           </div>
         )}
       </div>
@@ -94,21 +94,21 @@ export default function PlanDisplay({
         <button
           type="button"
           onClick={() => window.print()}
-          className="rounded-2xl border border-border px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-card"
+          className="rounded-2xl border border-border px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-card dark:border-[#292929] dark:bg-[#242424] dark:text-[#e2e8f0] dark:hover:bg-[#313131]"
         >
           Export PDF
         </button>
         <button
           type="button"
           onClick={handleCopy}
-          className="rounded-2xl border border-border px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-card"
+          className="rounded-2xl border border-border px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-card dark:border-[#292929] dark:bg-[#242424] dark:text-[#e2e8f0] dark:hover:bg-[#313131]"
         >
           Copy Summary
         </button>
         <button
           type="button"
           onClick={onPlanAnother}
-          className="rounded-2xl bg-primary px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"
+          className="rounded-2xl bg-primary px-5 py-2.5 text-sm font-medium text-white hover:opacity-90 dark:bg-[#006239] dark:text-[#e2e8f0] dark:hover:bg-[#007a46]"
         >
           Plan Another Trip
         </button>

@@ -191,7 +191,7 @@ export default function MapView({ destination, hotels = [], plan }) {
   // Show loading state if no markers are ready
   if (!markers.destination && !markers.flight && markers.hotels.length === 0) {
     return (
-      <div className="flex h-[300px] items-center justify-center rounded-2xl border border-border bg-card text-sm text-slate-500">
+      <div className="flex h-[300px] items-center justify-center rounded-2xl border border-border bg-card text-sm text-slate-500 dark:border-[#292929] dark:bg-[#171717] dark:text-[#a2a2a2]">
         Loading map…
       </div>
     );
@@ -204,7 +204,7 @@ export default function MapView({ destination, hotels = [], plan }) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="h-[300px] w-full overflow-hidden rounded-2xl border border-border"
+      className="h-[300px] w-full overflow-hidden rounded-2xl border border-border dark:border-[#292929] dark:bg-[#171717] dark:p-1 dark:shadow-[0_12px_30px_rgba(0,0,0,0.22)]"
       style={{ height: '300px' }}
     >
       <MapContainer

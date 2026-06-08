@@ -8,34 +8,34 @@ export default function BudgetBreakdown({ plan }) {
   const sum = flights + hotels + activities || 1;
 
   const segments = [
-    { label: 'Flights', amount: flights, color: 'bg-blue-400', width: (flights / sum) * 100 },
-    { label: 'Hotels', amount: hotels, color: 'bg-primary', width: (hotels / sum) * 100 },
+    { label: 'Flights', amount: flights, color: 'bg-blue-400 dark:bg-[#4ade80]', width: (flights / sum) * 100 },
+    { label: 'Hotels', amount: hotels, color: 'bg-primary dark:bg-[#006239]', width: (hotels / sum) * 100 },
     {
       label: 'Activities & food',
       amount: activities,
-      color: 'bg-amber-400',
+      color: 'bg-amber-400 dark:bg-[#313131]',
       width: (activities / sum) * 100,
     },
   ].filter((s) => s.amount > 0);
 
   return (
     <section className="mb-8">
-      <h3 className="mb-4 text-lg font-semibold text-slate-900">Budget breakdown</h3>
+      <h3 className="mb-4 text-lg font-semibold text-slate-900 dark:text-[#e2e8f0]">Budget breakdown</h3>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-2xl border border-border bg-card p-6"
+        className="rounded-2xl border border-border bg-card p-6 dark:border-[#292929] dark:bg-[#171717] dark:shadow-[0_12px_30px_rgba(0,0,0,0.22)]"
       >
-        <p className="text-3xl font-bold text-primary">
+        <p className="text-3xl font-bold text-primary dark:text-[#4ade80]">
           {sym}
           {Number(total).toLocaleString()}
         </p>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-500 dark:text-[#a2a2a2]">
           Total trip budget ({plan?.currency_name || ''})
         </p>
 
         {segments.length > 0 && (
-          <div className="mt-6 flex h-4 overflow-hidden rounded-full">
+          <div className="mt-6 flex h-4 overflow-hidden rounded-full dark:bg-[#242424]">
             {segments.map((s) => (
               <div
                 key={s.label}
@@ -49,10 +49,10 @@ export default function BudgetBreakdown({ plan }) {
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {segments.map((s) => (
-            <div key={s.label} className="rounded-2xl border border-border bg-white p-4">
+            <div key={s.label} className="rounded-2xl border border-border bg-white p-4 dark:border-[#292929] dark:bg-[#242424]">
               <div className={`mb-2 h-1 w-8 rounded ${s.color}`} />
-              <p className="text-xs text-slate-500">{s.label}</p>
-              <p className="text-lg font-semibold text-slate-900">
+              <p className="text-xs text-slate-500 dark:text-[#a2a2a2]">{s.label}</p>
+              <p className="text-lg font-semibold text-slate-900 dark:text-[#e2e8f0]">
                 {sym}
                 {s.amount.toLocaleString()}
               </p>

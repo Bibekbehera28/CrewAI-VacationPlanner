@@ -1,15 +1,20 @@
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 function Step({ icon, title, text }) {
   return (
-    <div className="rounded-2xl border border-border bg-white p-5">
-      <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg dark:border-[#292929] dark:bg-[#171717]">
+      <div className="flex items-start gap-4">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-xl">
           {icon}
         </div>
+
         <div>
-          <p className="text-sm font-semibold text-slate-900">{title}</p>
-          <p className="mt-1 text-sm text-slate-600">{text}</p>
+          <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+            {title}
+          </h3>
+          <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            {text}
+          </p>
         </div>
       </div>
     </div>
@@ -22,74 +27,150 @@ export default function AboutPage({ onStartPlanning }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 10 }}
-      className="mx-auto h-full w-full max-w-3xl overflow-y-auto px-4 py-8 md:px-8"
+      className="mx-auto h-full w-full max-w-5xl overflow-y-auto px-4 py-8 md:px-8"
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 md:text-4xl">VoyageAI</h1>
-          <p className="mt-2 text-slate-600">AI-powered vacation planning for everyone</p>
+      {/* Hero */}
+      <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm dark:border-[#292929] dark:bg-[#171717]">
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="mb-3 inline-flex rounded-full border border-green-500/20 bg-green-500/10 px-4 py-1 text-sm font-medium text-green-600 dark:text-green-400">
+              ✈️ AI-Powered Travel Planning
+            </div>
+
+            <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100 md:text-5xl">
+              VoyageAI
+            </h1>
+
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-400">
+              Plan complete vacations in seconds using intelligent AI agents.
+              Discover destinations, find hotels, generate itineraries, budgets,
+              maps, and travel-ready plans from a single prompt.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onStartPlanning}
+            className="rounded-2xl bg-primary px-6 py-3 font-semibold text-white transition-all hover:scale-105"
+          >
+            Start Planning →
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onStartPlanning}
-          className="rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
-        >
-          Start Planning
-        </button>
       </div>
 
-      <div className="mt-10 space-y-10">
-        <section>
-          <h2 className="text-lg font-semibold text-slate-900">What is VoyageAI</h2>
-          <p className="mt-2 text-sm leading-relaxed text-slate-600">
-            VoyageAI is an intelligent multi-agent AI system that plans complete vacations from a
-            single natural language query—helping you go from an idea to a detailed itinerary,
-            hotels, and budget breakdown.
+      {/* Features */}
+      <div className="mt-10 grid gap-4 md:grid-cols-3">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 dark:border-[#292929] dark:bg-[#171717]">
+          <div className="text-3xl">⚡</div>
+          <h3 className="mt-3 font-semibold text-slate-900 dark:text-slate-100">
+            Instant Planning
+          </h3>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+            Generate complete travel plans in seconds.
           </p>
-        </section>
+        </div>
 
-        <section>
-          <h2 className="text-lg font-semibold text-slate-900">How it works</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <Step
-              icon={<span className="text-lg">🗺️</span>}
-              title="1. Tell us your trip idea"
-              text="Share your budget, vibe, and duration in one message."
-            />
-            <Step
-              icon={<span className="text-lg">🤖</span>}
-              title="2. AI agents find destinations"
-              text="We generate best-fit destinations based on your preferences."
-            />
-            <Step
-              icon={<span className="text-lg">✅</span>}
-              title="3. Pick your favorite"
-              text="Choose a destination to generate a complete plan."
-            />
-            <Step
-              icon={<span className="text-lg">🏨</span>}
-              title="4. Get a complete plan"
-              text="Hotels, itinerary, map, and budget—ready to export."
-            />
-          </div>
-        </section>
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 dark:border-[#292929] dark:bg-[#171717]">
+          <div className="text-3xl">🧠</div>
+          <h3 className="mt-3 font-semibold text-slate-900 dark:text-slate-100">
+            Multi-Agent AI
+          </h3>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+            Specialized AI agents collaborate to create better trips.
+          </p>
+        </div>
 
-        <section>
-          <h2 className="text-lg font-semibold text-slate-900">Tech stack</h2>
-          <div className="mt-3 rounded-2xl border border-border bg-white p-5">
-            <ul className="grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
-              <li>React + Vite frontend</li>
-              <li>FastAPI + CrewAI backend</li>
-              <li>OpenRouter LLM (free models)</li>
-              <li>OpenWeatherMap for weather data</li>
-              <li>Geoapify for real hotel data</li>
-              <li>Leaflet + OpenStreetMap for maps</li>
-              <li>Supabase for data storage</li>
-            </ul>
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 dark:border-[#292929] dark:bg-[#171717]">
+          <div className="text-3xl">🌍</div>
+          <h3 className="mt-3 font-semibold text-slate-900 dark:text-slate-100">
+            Worldwide Destinations
+          </h3>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+            Explore destinations around the globe.
+          </p>
+        </div>
+      </div>
+
+      {/* How It Works */}
+      <section className="mt-12">
+        <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-slate-100">
+          How VoyageAI Works
+        </h2>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Step
+            icon="🗺️"
+            title="Tell Us Your Travel Idea"
+            text="Describe budget, destination preferences, duration, and travel style."
+          />
+
+          <Step
+            icon="🤖"
+            title="AI Finds Perfect Matches"
+            text="Multiple AI agents analyze your request and discover suitable destinations."
+          />
+
+          <Step
+            icon="✅"
+            title="Choose Your Destination"
+            text="Review recommendations and select your favorite option."
+          />
+
+          <Step
+            icon="🏨"
+            title="Get Complete Trip Plan"
+            text="Hotels, itinerary, weather, maps, budget allocation, and travel tips."
+          />
+        </div>
+      </section>
+
+      {/* Tech Stack */}
+      <section className="mt-12">
+        <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-slate-100">
+          Technology Stack
+        </h2>
+
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 dark:border-[#292929] dark:bg-[#171717]">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              "⚛️ React + Vite",
+              "🚀 FastAPI",
+              "🤖 CrewAI",
+              "🧠 OpenRouter",
+              "🌦️ OpenWeather",
+              "🏨 Geoapify",
+              "🗺️ Leaflet Maps",
+              "🗄️ Supabase",
+              "☁️ Vercel + Render",
+            ].map((item) => (
+              <div
+                key={item}
+                className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm dark:border-[#292929] dark:bg-[#1f1f1f] dark:text-slate-300"
+              >
+                {item}
+              </div>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <div className="mt-12 rounded-3xl border border-slate-200 bg-white p-8 text-center dark:border-[#292929] dark:bg-[#171717]">
+        <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+          Ready for Your Next Adventure?
+        </h3>
+
+        <p className="mt-2 text-slate-600 dark:text-slate-400">
+          Let AI handle the planning while you enjoy the journey.
+        </p>
+
+        <button
+          onClick={onStartPlanning}
+          className="mt-5 rounded-2xl bg-primary px-6 py-3 font-semibold text-white transition-all hover:scale-105"
+        >
+          Start Planning Now
+        </button>
       </div>
     </motion.div>
   );
 }
-
