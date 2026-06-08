@@ -1,11 +1,6 @@
-"use client";
-
 import { motion } from "framer-motion";
 import clsx from "clsx";
 
-interface BackgroundCirclesProps {
-    className?: string;
-}
 
 const COLOR_VARIANTS = {
   primary: {
@@ -16,7 +11,7 @@ const COLOR_VARIANTS = {
     ],
     gradient: "from-[#72e3ad]/30",
   },
-} as const;
+};
 
 const AnimatedGrid = () => (
     <motion.div
@@ -34,9 +29,7 @@ const AnimatedGrid = () => (
     </motion.div>
 );
 
-export function BackgroundCircles({
-  className,
-}: BackgroundCirclesProps){
+export function BackgroundCircles({ className }) {
     const variantStyles = COLOR_VARIANTS.primary;
     return (
         <div
